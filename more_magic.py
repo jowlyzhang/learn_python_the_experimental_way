@@ -1,10 +1,15 @@
-class MyObject():
-    def __init__(self):
-        pass
+"""A few of the magic methods inherited from the `object` class
+to support behavior of customer defined classes are exprimented in
+other modules. Listed below:
+    In the cmp_iden module:__eq__, __ne__, __le__, __ge__, __lt__
+    __gt__, __cmp__, __hash__.
+    In the py_callable module: __new__, __init__, __call__, __get__,
+    and __set__.
 
-    def __new__(self):
-        pass
-
+This module is for trying out some other magic methods that are listed
+below and can be generally split into three parts.
+"""
+class MyObject(object):
     def __delattr__(self):
         pass
 
@@ -13,16 +18,6 @@ class MyObject():
 
     def __setattr__(self):
         pass
-
-    def __dict__(self):
-        pass
-
-    def __hash__(self):
-        pass
-
-    def __class__(self):
-        pass
-
     def __str__(self):
         pass
 
