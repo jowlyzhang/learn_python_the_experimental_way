@@ -29,8 +29,23 @@ That's how a class stores variables for different instances.
 There could be more complecation when it comes to how class
 store their attributes. But it wouldn't be so hard with the
 idea that class is also objects in python.
+
+Just explicitely pointing out the magic methods of dict type.
+Nothing special.
 """
-import pdb
+class MyDict(dict):
+    def __setitem__(self, key, value):
+        return dict.__setitem__(self, key, value)
+
+    def __getitem__(self, key):
+        return dict.__getitem__(self, key)
+
+    def __delitem__(self, key):
+        return dict.__delitem__(self, key)
+
+    def __contains__(self, key):
+        return dict.__contains__(self, key)
+
 
 class MyGetSetDescriptor(object):
     def __init__(self, name):
@@ -39,7 +54,7 @@ class MyGetSetDescriptor(object):
 
     def __get__(self, instance, cls):
         if instance not in self.all_insts_vars:
-            self.all_insts_vars[instance] = dict()
+            self.all_insts_vars[instance] = MyDict()
             instance.__dict__  = self.all_insts_vars[instance]
         return self.all_insts_vars[instance]
 
@@ -51,6 +66,12 @@ class Dog(object):
     def __init__(self, name):
         self.name = name
 
+    def __getattr__(self, name):
+        if name == 'special':
+            return 'that is the special attribute'
+        else:
+            raise AttributeError('No such attribute')
+
     def __getattribute__(self, attr_name):
         print '\nVerbose getter\n'
         try:
@@ -60,19 +81,24 @@ class Dog(object):
 
         try:
             return Dog.__dict__[attr_name].__get__(self, Dog)
-        except AttributeError:
+        except (KeyError, AttributeError):
             pass
 
         try:
             return Dog.__dict__[attr_name]
         except KeyError:
+            pass
+
+        try:
+            return self.__getattr__(attr_name)
+        except AttributeError:
             raise
 
     def __setattr__(self, attr_name, value):
         print '\nVerbose setter\n'
         Dog.__dict__['__dict__'].__get__(self, Dog)[attr_name] = value
 
-    def __delattr__(self, sttr_name):
+    def __delattr__(self, attr_name):
         print '\nVerbose Deletter\n'
         del Dog.__dict__['__dict__'].__get__(self, Dog)[attr_name]
 
@@ -90,4 +116,4 @@ if __name__ == '__main__':
     print type(Dog.__dict__['__dict__'])
     print dog_a.color, dog_b.color
     del dog_a.weight
-    print dog_a.weight
+    print dog_a.special
