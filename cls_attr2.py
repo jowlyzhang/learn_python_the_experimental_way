@@ -3,8 +3,8 @@
 This would explain why dog_a.name would give 'lina', and dog_b.name would give
 'losh'.
 Class and objects supports access to attributes both through the attribute operator,
-(Implemented via the class or its metaclass's __getattribute__ method). To be more
-specific:
+(Implemented via the class or its metaclass's __getattribute__ method). and the __dict__
+attribute protocol which also supports vars(). To be more specific:
     1. Accessing instance attributes as in a.b invokes python to call:
     type(a).__getattrbute__(a, 'b')
 
