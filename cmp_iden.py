@@ -1,17 +1,17 @@
 #!/usr/bin/python
-"""This module is for experimenting with Python's way of identity of
-objects.
->>> a = MyClass('lili')
-    b = MyClass('dili')
-    c = MyClass('lily')
-    print id(a), id(b), id(c)
+"""This module is for experimenting with Python's way of identity and comparison of
+customer defined class objects.
 
 identity of an object is unique upon its creation and unchangeable, retrieved with id(),
 you can think of it as the object's address in memory. The `is` operator is
-basically comparing two objects' identities.
+basically comparing two objects' identities. The behavior of the compareing operators
+including `==`, `!=`, `<=`, `>=`, `<`, `>` for a customer defined class are defined
+by the below magic methods. __eq__, __ne__, __le__, __ge__, __lt__, __gt__ and a
+once-and-for-all magic method __cmp__, that not only defines behavior of the above operators
+but also of the builtin function cmp().
 
 type of an object is also unchangeable, retrieved with type(), it determines operations
-this object supports and possible values it could have
+this object supports and possible values it could have.
 """
 
 class MyClass(object):
@@ -50,8 +50,29 @@ class MyClass(object):
         elif ord(self.name[0]) > ord(another_instance.name[0]):
             return 1"""
 
-
+    # __hash__ magic method is called by the builtin hash() function to
+    # create a hash value when a class instance is used as a dictionary key
+    # and the hash value can be used for quick key comparison. Note that
+    # the hash value is not used directly as the key. Below, it's verified.
     def __hash__(self):
         return ord(self.name[0])
 
+if __name__ == '__main__':
+    a = MyClass('lili')
+    b = MyClass('dili')
+    c = MyClass('lily')
+    print a is b
+    print a is c
+    print b is c
+    print id(a), id(b), id(c)
+    print a == c
+    print a < b
+    test_dict = {}
+    test_dict[a] = 'lili'
+    test_dict[c] = 'lily'
+    # Looks like the hash value is not used directly as the dictionary
+    # Key. How dictionary compute and stores key can be another topic
+    # we'll look into next time.
+    for i in range(0, 10):
+        print test_dict[a], test_dict[c]
 
