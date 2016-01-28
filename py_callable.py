@@ -1,5 +1,23 @@
 #!/usr/bin/python
-"""The objects in python that are callable.
+"""The module experiments objects in python that are callable.
+This includes but not limited to:
+    1. Class is callable, calling them usually cause a new instance of
+    that class to be initiated, but that behavior can be customized by
+    overriding the __new__ method of the function
+    2. Class instance can be callable if it has the __call__ method
+    implemented.
+    3. Customer defined functions can be called, and since it's also an object, it
+    has a bunch of regular values. when a function is defined as a class
+    method, it would be a bound function of a class instance, and the
+    __self__ attribute would refer to the class instance.
+    4. Class methods can be called, class methods are also custome defined functions,
+    it's just that they are called and accessed as a class attribute. The function
+    object has a __get__ function defined to deal with this type of calling. The
+    `Myfunc` class defined below to for mimicing this type of function definition
+    that would server this purpose.
+    5. Generator functions are callable
+    6. Builtin functions are callable.
+    7. Builtin class methods are callable.
 """
 class Myfunc(object):
     def __init__(self, *args):
