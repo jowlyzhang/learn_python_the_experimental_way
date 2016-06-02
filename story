@@ -79,7 +79,7 @@ Mr crazyclass: Hello, sir, morning, I had a bad feeling about this, can you call
 Mr python: Don't panic sir, let me check and see what you need, we may be able to help, I will call him
     for you. Hello, Mr MetaA, another variable come for you.
 Mr crazyclass: Well, my name is 'crazyclass', I had a bad feeling about this.
-    I was also given another name called Mr classA to all Mr MetaA with.
+    I was also given another name called Mr classA to call Mr MetaA with.
 Mr python: ok, my first relief is that I do have those two gentleman here already, I will call Mr MetaA for
     you and see if it works.
     (calling Mr MetaA)

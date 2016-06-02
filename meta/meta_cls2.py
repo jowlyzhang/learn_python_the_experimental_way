@@ -1,5 +1,178 @@
 #!/usr/bin/python
-"""Metaprogramming is aiming at using a class factory that dynamically
+"""Meta classes are created by 'type', classes are also created by 'type'. Class
+objects are created by 'object'. The simplest case, not any customerization:
+not only is metaclass created by 'type', it also inherites all the good methods that
+type has.
+    >>> class MyMeta(type): pass
+    >>> MyMeta = type('MyMeta', (type, ), {})
+    >>> class MyClass:
+            __metaclass__ = MyMeta
+
+    >>> MyClass = MyMeta('MyClass', (), {})
+    >>> MyClass.__class__
+    >>> MyMeta
+    >>> MyClass = type.__new__(MyMeta, 'MyClass', (), {})
+    >>> MyClass.__class__
+    >>> MyMeta
+
+    >>> MyMeta.__new__ = type.__new__ # Classes created by type
+    >>> True
+    >>> MyClass.__new__ = object.__new__ # Class objects created by object
+    >>> True
+
+    >>> type.__class__ = type
+    >>> type.__class__.__new__ = type.__new__
+    >>> type.__base__.__new__ = object.__new__
+    >>> object.__base__ == None
+
+Attach a figure.
+"""
+class MyMeta(type):
+    pass
+
+# is egual to
+MyMeta = type.__new__(type, 'MyMeta', (type,), {})
+
+# To add some customerization, don't forget call type.__new__
+# Customerization can be fulfilled in the __init__ method most likely
+
+class MyMeta(type):
+    def __new__(meta_cls, *args, **kwds):
+        # It looks like in the __new__ function of type, it will call
+        # the __init__ function of the class at some time, don't need
+        # to specifically call it.
+        cls = type.__new__(meta_cls, *args, **kwds)
+        print cls
+        type(cls)
+        cls.__class__
+        # This one won't work, looks like it's not passing the object class to bound
+        #cls.__init__(*args, **kwds)
+        # This one works even though it't not required
+        meta_cls.__init__(cls, *args, **kwds)
+        return cls
+
+    def __init__(cls, name, bases, dct):
+        print 'Customer metaclass'
+        type.__init__(cls, name, bases, dct)
+        cls.uses_metaclass = lambda self: 'yes'
+
+class MyClass(object):
+    pass
+
+# is equal to
+
+MyClass = type('MyClass', (), {})
+
+class MyClass(object):
+    __metaclass__ = MyMeta
+
+# is equal to
+MyClass = MyMeta('MyClass', (object,), {})
+
+# To add some customerization, don't forget to call object.__new__
+
+class MyClass(object):
+    __metaclass__ = MyMeta
+    def __new__(cls, *args, **kwds):
+        self = object.__new__(cls)
+        print self
+        type(self)
+        self.__class__
+        # Below lines both work even though it's not needed.
+        MyClass.__init__(self, *args, **kwds)
+        self.__init__(*args, **kwds)
+        return self
+
+    def __init__(self, *args, **kwds):
+        print 'customer class'
+        print 'I got args: {}'.format(args)
+        print 'I got kwds: {}'.format(kwds)
+
+"""
+At the end of this metaclass journey, it turned out there are bigger doors open
+to understand even more about python's object oriented working mechanism, other
+than just understanding the meta class mechanism. Let's tell it as a story.
+There is a guy named `type`, when he get a request from someone that they want
+to create an object, he asks.
+    1. 'what name do you want to give to this object?', he got it, then he asked
+    2. 'should this object be in any inheritance relationship with other objects?'
+    3. 'what property does this object have in hand?'
+
+    After he got the answers, he has two magic tools to help him make this object.
+    1. The first one is called `__new__`, he uses this guy to scoop a chunk of space from
+    the memory to store this object.
+
+    let's assume calling type.__new__(cls_name, *args, **kwds) is equivalaent of calling the C
+    function that deals with memory and scoop such a chunk for us
+
+    a chunk of memory space is scooped by C function whenever one of the following things happen:
+        1. class SomeName(type):
+           some variable inherites 'type', which makes it a metaclass
+        2. class SomeName:  or
+           class SomeName(object):  or
+           class SomeName:
+               __metaclass__ = SomeMetaClassName  or
+           class SomeName(object):
+               __metaclass__ = SomeMetaClassName
+
+           Some class variable is defined, it either has or doesn't have a customized metaclass.
+
+    a chunk of memory space is scooped by python function when you do
+        3. SomeName = OtherName()  where OtherName has a '__new__' method in its namespace
+
+    remeber that the '__new__' and '__init__' method you defined for a metaclass or a class
+    is defining the actions for creating its respective objects, not for creating itself.
+
+    2. The second one is called `__init__`, which he uses to do some extra decoration
+    for this object.
+
+    3. He also do some extra stuff, like link this guy with the other objects he should
+    be linked with, which may involve some computation of path to get to those objects.
+He then returns this object to whoever asks for it.
+
+There are some guys out their that also wants to have type's magic power of creating
+an object. So these guys declare that they are type's kids. They are called metaclass
+By being type's kids, they automatically have all the power that type has, because they
+can always ask type to do it for them and they can even augument if they want.
+They can create an object upon requests too. These guys can take over type's role as
+a factory for classes.
+
+But people notices that the class object created by metaclass can also create an object
+upon requests too. Themselves serve as a factory for creating instances, how could that
+happen? Only guys who have the magic power of 'scooping' memory space and `decorating`
+it has the power to create objects. type's kids have that power, but why are these
+class objects also have that power. It turned out another guy called `object` also has
+similar power.`object` is not type's kid, he doesn't inherit anything from type. But
+when you ask object something about his identity, he says he's related to type. He also
+has the magic of 'scooping' memory and decorate it, but his specialization is different.
+He gets called at different times and asks different questions. type gets called when
+a class object is created in the code or when get called explicitely for such purpose.
+
+When python sees something like this: a(*args, **kwds), he asks a
+    1. Do you have a __call__ method? if not, looks like you are a little nobody
+    2. Does your __class__ object has a __call__ method ? if not
+    2. Does your __class__ object's father have a __call__method? if not keep asking
+    3. Does your __class__ object's grandfather have a __call__method?
+
+When it comes to the __call__ method of its class, it will do a.__class__.__call__(a, *args, **kwds)
+
+When it comes all the way to Mr object. And python tell Mr object that somebody called you
+with this *args, *kwds, please take it and give me something, I will return whatever you give
+me to that someone. So Mr object would ask __new__ to scoop a chunk of memory, and ask __init__
+if he wants to do something extra and return that thing to python.
+
+When it comes all the way to Mr Type, Python tell Mr Type that somebody is trying to call
+you with this *args, **kwds, please take it and give me something. Mr type take a look at
+this args and kwds and asks?
+    1. What nametag does this someone want me to put on the thing I created?
+    2. What is this thing's ancesters? Nothing? ok, I'll make `object` its dad
+    3. Is there anything available right now to put into the object I created?
+If python cannot give answers that follow Mr types format, Mr type would simply not do it.
+Metaclass defines customized class definition, class defines customized
+objects definition.
+It usually suffice to put your customization in the __init__ method unless
+you want to interfer witht the memory allocation process.
+Metaprogramming is aiming at using a class factory that dynamically
 create classes for use in the same way that class instances are created.
 The factory for class instances are class themselves. Similarly, the
 factory for class creation is metaclass. The default metaclass in python
@@ -54,6 +227,8 @@ class MyMeta(type):
 
     def __init__(cls, name, bases, dct):
         super(MyMeta, cls).__init__(name, bases, dct)
+        # equal to:
+        # type.__init__(cls, name, bases, dct)
         cls.uses_metaclass = lambda self: "yes!"
 
 def funcMeta(name, bases, nmspc):
@@ -259,62 +434,44 @@ if __name__ == '__main__':
     exec initializations in globals()
     Event.run_events()
 
-"""
-At the end of this metaclass journey, it turned out there are bigger doors open
-to understand even more about python's object oriented working mechanism, other
-than just understanding the meta class mechanism. Let's tell it as a story.
-There is a guy named `type`, when he get a request from someone that they want
-to create an object, he asks.
-    1. 'what name do you want to give to this object?', he got it, then he asked
-    2. 'should this object be in any inheritance relationship with other objects?'
-    3. 'what property does this object have in hand?'
 
-    After he got the answers, he has two magic tools to help him make this object.
-    1. The first one is called `__new__`, he uses this guy to scoop a chunk of space from
-    the memory to store this object.
-    2. The second one is called `__init__`, which he uses to do some extra decoration
-    for this object.
-    3. He also do some extra stuff, like link this guy with the other objects he should
-    be linked with, which may involve some computation of path to get to those objects.
-He then returns this object to whoever asks for it.
+class MyMeta(type):
+    pass
 
-There are some guys out their that also wants to have type's magic power of creating
-an object. So these guys declare that they are type's kids. They are called metaclass
-By being type's kids, they automatically have all the power that type has, because they
-can always ask type to do it for them and they can even augument if they want.
-They can create an object upon requests too. These guys can take over type's role as
-a factory for classes.
+# is egual to
+MyMeta = type.__new__(type, 'MyMeta', (type,), {})
 
-But people notices that the class object created by metaclass can also create an object
-upon requests too. Themselves serve as a factory for creating instances, how could that
-happen? Only guys who have the magic power of 'scooping' memory space and `decorating`
-it has the power to create objects. type's kids have that power, but why are these
-class objects also have that power. It turned out another guy called `object` also has
-similar power.`object` is not type's kid, he doesn't inherit anything from type. But
-when you ask object something about his identity, he says he's related to type. He also
-has the magic of 'scooping' memory and decorate it, but his specialization is different.
-He gets called at different times and asks different questions. type gets called when
-a class object is created in the code or when get called explicitely for such purpose.
+# To add some customerization, don't forget call type.__new__
+class MyMeta(type):
+    def __new__(meta_cls, *args, **kwds):
+        cls = type.__new__(meta_cls, *args, **kwds)
+        cls.__init__(*args, **kwds)
+        return cls
 
-When python sees something like this: a(*args, **kwds), he asks a
-    1. Do you have a __call__ method? if not, looks like you are a little nobody
-    2. Does your __class__ object has a __call__ method ? if not
-    2. Does your __class__ object's father have a __call__method? if not keep asking
-    3. Does your __class__ object's grandfather have a __call__method?
+    def __init__(cls, name, bases, dct):
+        print 'Customer metaclass'
+        type.__init__(cls, name, bases, dct)
+        cls.uses_metaclass = lambda self: 'yes'
 
-When it comes to the __call__ method of its class, it will do a.__class__.__call__(a, *args, **kwds)
+ class MyClass(object):
+     __metaclass__ = MyMeta
 
-When it comes all the way to Mr object. And python tell Mr object that somebody called you
-with this *args, *kwds, please take it and give me something, I will return whatever you give
-me to that someone. So Mr object would ask __new__ to scoop a chunk of memory, and ask __init__
-if he wants to do something extra and return that thing to python.
+ # is equal to
+MyClass = MyMeta('MyClass', (object,), {})
 
-When it comes all the way to Mr Type, Python tell Mr Type that somebody is trying to call
-you with this *args, **kwds, please take it and give me something. Mr type take a look at
-this args and kwds and asks?
-    1. What nametag does this someone want me to put on the thing I created?
-    2. What is this thing's ancesters? Nothing? ok, I'll make `object` its dad
-    3. Is there anything available right now to put into the object I created?
-If python cannot give answers that follow Mr type's format, Mr type would simply not do it.
-"""
+# To add some customerization, don't forget to call object.__new__
+
+class MyClass(object):
+    __metaclass__ = MyMeta
+    def __new__(cls, *args, **kwds):
+        self = object.__new__(cls)
+        self.__init__(*args, **kwds)
+        return self
+
+    def __init__(self, *args, **kwds):
+        print 'customer class'
+        print 'I got args: {}'.format(args)
+        print 'I got kwds: {}'.format(kwds)
+
+
 
