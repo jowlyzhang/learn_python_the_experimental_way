@@ -18,42 +18,50 @@ very routine and a little boring, and categorize these attributes accordingly.
 *'__doc__': 'The most base type',
 *'__init__': <slot wrapper '__init__' of 'object' objects>
 
-The first type:
-    below statement evaluates to True:
-    object.__dict__['__setattr__'] == object.__setattr__
-    object.__dict__['__new__'] == object.__new__
-    object.__dict__['__reduce__'] == object.__reduce__
-    object.__dict__['__str__'] == object.__str__
-    object.__dict__['__format__'] == object.__format__
-    object.__dict__['__getattribute__'] == object.__getattribute__
-    object.__dict__['__delattr__'] == object.__delattr__
-    object.__dict__['__repr__'] == object.__repr__
-    object.__dict__['__hash__'] == object.__hash__
-    object.__dict__['__sizeof__'] == object.__sizeof__
-    object.__dict__['__doc__'] == object.__doc__
-    object.__dict__['__init__'] == object.__init__
-    object.__dict__['__reduce_ex__'] == object.__reduce_ex__
 
+class A(object): pass
+
+The first type:
+
+    below statement evaluates to True:
+    object.__dict__['__setattr__'] == object.__setattr__ == A.__setattr__
+    object.__dict__['__new__'] == object.__new__ == A.__new__
+    object.__dict__['__reduce__'] == object.__reduce__ == A.__reduce__
+    object.__dict__['__str__'] == object.__str__ == A.__str__
+    object.__dict__['__format__'] == object.__format__ == A.__format__
+    object.__dict__['__getattribute__'] == object.__getattribute__  = A.__getattribute__
+    object.__dict__['__delattr__'] == object.__delattr__ == A.__delattr__
+    object.__dict__['__repr__'] == object.__repr__ == A.__repr__
+    object.__dict__['__hash__'] == object.__hash__ == A.__hash__
+    object.__dict__['__sizeof__'] == object.__sizeof__ == A.__sizeof__
+     object.__dict__['__init__'] == object.__init__ == A.__init__
+    object.__dict__['__reduce_ex__'] == object.__reduce_ex__ == A.__reduce_ex__
+
+Above two statement stands true explains two things:
+    1. These are the methods that a class inherite from object by default if it doesn't
+       have customization. ----> A class must have these basic attribute and it's ok to be
+       the same as another class(object's). it is a class level behaviour description, 
+       no instance specification is needed.
+
+The second type:
+
+    object.__dict__['__doc__'] == object.__doc__
+but:
+    object.__doc__ != A.__doc__
+
+    It is a class level description, no instance specification is needed. 
+    These are methods or attributes that shouldn't be the same as the class it inherites from.
+    
 These are the ones that customer classes would have with the most basic definition
 and they by default would have the same as object's one as default.
 
-The second type:
-    below statements evalutes to False:
-    object.__dict__['__class__'] == object.__class__
+The thrid type:
+    object.__dict__['__class__'] != object.__class__
+    object.__class__ != A.__class__
 
-object.__dict__['__class__']
-<attribute '__class__' of 'object' objects>
->>> object.__class__
-<type 'type'>
+    object.__dict__['__subclasshook__'] != object.__subclasshook__
 
-     object.__dict__['__subclasshook__'] == object.__subclasshook__
-
-     object.__dict__['__subclasshook__']
-<method '__subclasshook__' of 'object' objects>
->>> object.__subclasshook__
-<built-in method __subclasshook__ of type object at 0x911420>
-
-
+    It is not a class level description. it has instance specifications.
 
 type.__dict__
 
