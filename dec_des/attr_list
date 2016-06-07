@@ -1,0 +1,96 @@
+object.__dict__
+For all of the bellowing attributes of object. I experimented something
+very routine and a little boring, and categorize these attributes accordingly.
+
+*'__setattr__': <slot wrapper '__setattr__' of 'object' objects>, 
+'__reduce_ex__': <method '__reduce_ex__' of 'object' objects>,
+*'__new__': <built-in method __new__ of type object at 0x911420>,
+'__reduce__': <method '__reduce__' of 'object' objects>,
+*'__str__': <slot wrapper '__str__' of 'object' objects>, 
+*'__format__': <method '__format__' of 'object' objects>,
+*'__getattribute__': <slot wrapper '__getattribute__' of 'object' objects>,
+*'__class__': <attribute '__class__' of 'object' objects>,
+*'__delattr__': <slot wrapper '__delattr__' of 'object' objects>,
+'__subclasshook__': <method '__subclasshook__' of 'object' objects>,
+*'__repr__': <slot wrapper '__repr__' of 'object' objects>,
+*'__hash__': <slot wrapper '__hash__' of 'object' objects>,
+*'__sizeof__': <method '__sizeof__' of 'object' objects>,
+*'__doc__': 'The most base type',
+*'__init__': <slot wrapper '__init__' of 'object' objects>
+
+The first type:
+    below statement evaluates to True:
+    object.__dict__['__setattr__'] == object.__setattr__
+    object.__dict__['__new__'] == object.__new__
+    object.__dict__['__reduce__'] == object.__reduce__
+    object.__dict__['__str__'] == object.__str__
+    object.__dict__['__format__'] == object.__format__
+    object.__dict__['__getattribute__'] == object.__getattribute__
+    object.__dict__['__delattr__'] == object.__delattr__
+    object.__dict__['__repr__'] == object.__repr__
+    object.__dict__['__hash__'] == object.__hash__
+    object.__dict__['__sizeof__'] == object.__sizeof__
+    object.__dict__['__doc__'] == object.__doc__
+    object.__dict__['__init__'] == object.__init__
+    object.__dict__['__reduce_ex__'] == object.__reduce_ex__
+
+These are the ones that customer classes would have with the most basic definition
+and they by default would have the same as object's one as default.
+
+The second type:
+    below statements evalutes to False:
+    object.__dict__['__class__'] == object.__class__
+
+object.__dict__['__class__']
+<attribute '__class__' of 'object' objects>
+>>> object.__class__
+<type 'type'>
+
+     object.__dict__['__subclasshook__'] == object.__subclasshook__
+
+     object.__dict__['__subclasshook__']
+<method '__subclasshook__' of 'object' objects>
+>>> object.__subclasshook__
+<built-in method __subclasshook__ of type object at 0x911420>
+
+
+
+type.__dict__
+
+'__module__': <attribute '__module__' of 'type' objects>,
+'__abstractmethods__': <attribute '__abstractmethods__' of 'type' objects>,
+'__getattribute__': <slot wrapper '__getattribute__' of 'type' objects>,
+'__weakrefoffset__': <member '__weakrefoffset__' of 'type' objects>,
+'__dict__': <attribute '__dict__' of 'type' objects>,
+'__lt__': <slot wrapper '__lt__' of 'type' objects>,
+'__init__': <slot wrapper '__init__' of 'type' objects>,
+'__setattr__': <slot wrapper '__setattr__' of 'type' objects>,
+'__subclasses__': <method '__subclasses__' of 'type' objects>, 
+'__new__': <built-in method __new__ of type object at 0x919120>,
+'__base__': <member '__base__' of 'type' objects>,
+'__mro__': <member '__mro__' of 'type' objects>,
+'mro': <method 'mro' of 'type' objects>,
+'__dictoffset__': <member '__dictoffset__' of 'type' objects>,
+'__call__': <slot wrapper '__call__' of 'type' objects>,
+'__itemsize__': <member '__itemsize__' of 'type' objects>,
+'__ne__': <slot wrapper '__ne__' of 'type' objects>, 
+'__instancecheck__': <method '__instancecheck__' of 'type' objects>, 
+'__subclasscheck__': <method '__subclasscheck__' of 'type' objects>, 
+'__gt__': <slot wrapper '__gt__' of 'type' objects>, 
+'__name__': <attribute '__name__' of 'type' objects>, 
+'__eq__': <slot wrapper '__eq__' of 'type' objects>, 
+'__basicsize__': <member '__basicsize__' of 'type' objects>, 
+'__bases__': <attribute '__bases__' of 'type' objects>, 
+'__flags__': <member '__flags__' of 'type' objects>, 
+'__doc__': <attribute '__doc__' of 'type' objects>, 
+'__delattr__': <slot wrapper '__delattr__' of 'type' objects>, 
+'__le__': <slot wrapper '__le__' of 'type' objects>, 
+'__repr__': <slot wrapper '__repr__' of 'type' objects>, 
+'__hash__': <slot wrapper '__hash__' of 'type' objects>, '__ge__': <slot wrapper '__ge__' of 'type' objects>})
+
+
+
+Comes back from the perspective of how we want class, class objects' attributes to work like.
+Start with what descriptors are about:
+
+1. In the class object's __dict__
