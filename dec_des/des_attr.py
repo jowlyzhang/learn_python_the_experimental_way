@@ -71,7 +71,7 @@ class Weight(object):
             return
         return self.all_weight.get(instance, None)
 
-    def __del__(self, instance):
+    def __delete__(self, instance):
         if not self.all_weight.has_key(instance):
             print '{} not have value {}'.format(instance, self.name)
         self.all_weight.pop(instance)
@@ -102,13 +102,13 @@ toby.color
 Descriptors have similar protocol as the python instrinsic getset_descriptor
     __getattribute__ --> __get__
     __setattr__      --> __set__
-    __delattr__      --> __del__
+    __delattr__      --> __delete__
 
     the difference is that instead of manipulating the __dict__ attribute of an object, it
     manipulates the descriptor's own dictionary for keeping info. In our case, its self.all_weight.
 
 And there is such order of checking:
-    data descriptor > __dict__ getset descriptor > non data descriptor.
+    data descriptor > __dict__ getset descriptor > non data descriptor = class methods
 
 Below is a very detailed proceedure of how python checks for the attributes.
 
