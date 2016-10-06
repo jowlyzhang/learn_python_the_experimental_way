@@ -1,0 +1,27 @@
+obj.name
+
+If `obj` is an object:
+   Getting values:
+   obj.name
+   object.__getattribute__(obj, name) does:
+
+   -> type(obj).__dict__['name'].__get__(obj, type(obj)) (data descriptor)
+   -> obj.__dict__['name']
+   -> type(obj).__dict__['name'].__get__(obj, type(obj)) (non data descriptor)
+   -> type(obj).__getattr__(obj, name) (if there is one defined)
+
+   With the above chain of discovering:
+   Setting values:
+   obj.name = val
+   type(obj).__setattr__(obj, name, val):
+
+   -> type(obj).__dict__['name'].__set__(obj, val) (data descriptor)
+   -> obj.__dict__['name'] = val (the same as below)
+
+
+if `obj` is an class:
+    type.__getattribute__ does:
+    -> v = object.__getattribute__(self, name)
+       if v.has_key('__get__'):
+           return v.__get__(None, self)
+
