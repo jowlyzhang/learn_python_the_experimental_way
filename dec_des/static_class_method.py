@@ -56,6 +56,41 @@ class Myclassmethod(object):
         return self.func(self.cls, *args, **kwds)
 
 
+class Combomethod(object):
+    """A descriptor and decorator that makes a method called
+    as a class method and instance method. I haven't figured out the whole
+    bound method magic, it could also turned out to be a completely builtin
+    in methanism. So now, a previous bound method of a class/class instance
+    would end up being an instance of Combomethod. However, I can maually
+    tailor the print out message to hide this fact.
+    """
+    def __init__(self, func):
+        self.func = func
+        self.__name__ = self.func.__name__
+        self.__doc__ = self.func.__doc__
+        self.__dict__.update(self.func.__dict__)
+
+    def __str__(self):
+        if self.instance is not None:
+            return '<bound method {} of <class {}>>'.format(self.__name__, self.cls)
+        else:
+            return 'unbound method {}.{}'.format(self.cls, self.__name__)
+
+    def __format__(self):
+        return self.__str__()
+
+    def __get__(self, instance, cls):
+        self.instance = instance
+        self.cls = cls
+        return self
+
+    def __call__(self, *args, **kwds):
+        if self.instance is not None:
+            return self.func(self.instance, *args, **kwds)
+        else:
+            return self.func(self.cls, *args, **kwds)
+
+
 class Mystaticmethod(object):
     def __init__(self, func):
         self.func = func
