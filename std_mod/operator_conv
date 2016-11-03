@@ -1,0 +1,131 @@
+"""The operator module exports a set of efficient functions that corresponds
+to python intrinsic operators. It covers all the intrinsic operator, from logic
+operator, arithmetic operator. The whole point of having this I guess is to be
+able to write code as this:
+    >> sum(map(operator.mul, zip(xs, ys)))
+Instead:
+    >> sum(map(lambda x, y: x * y, zip(xs, ys)))
+
+More importantly, almost all of these operators have a 'i' version which does stuff
+in place efficiently. Convenients without trailing '__' is also available
+"""
+import operator as op
+
+# Section 1: Object comparison.
+op.lt(a, b)
+op.le(a, b)
+op.gt(a, b)
+op.ge(a, b)
+op.eq(a, b)
+op.ne(a, b)
+
+Note: These conv functions together with the coresponding magic method defined for
+a custoer class. Can enable doing intuitive object comparison for customer objects
+that unlike built-in 'cmp' would return any data type, not necessarily bool type.
+Example:
+class Dog(object):
+    def __init__(self, name):
+        self.name = name
+    def __lt__(self, otherdog):
+        if len(self.name) < len(otherdog.name):
+            return 'That is correct'
+        return 'That is incorrect'
+
+dudu = Dog('dudu')
+dangdang = Dog('dangdang')
+dudu < dangdang # That is correct
+operator.lt(dudu, dangdang) # That is incorrect
+
+
+# Section 2: Logic operator
+op.not_(a)
+op.truth(a)
+op.is_(a)
+op.is_not(a)
+
+Note: Cannot help feeling excited, how wonderful this is!
+
+# Section 3: Mathematical operation
+op.abs(a)
+op.add(a, b)
+op.sub(a, b)
+op.div(a, b)
+op.floordiv(a, b)
+op.truediv(a, b)
+op.mod(a, b)
+op.mul(a, b)
+op.neg(a, b)
+op.pos(a)
+op.pow(a, b)
+
+# Section 4: Bitwise operation.
+op.inv(a)
+op.invert(a)
+op.lshift(a, b)
+op.rshift(a, b)
+op.add_(a, b)
+op.or_(a, b)
+op.xor(a, b)
+
+# Section 5: List operation
+op.concat(a, b)
+op.contains(a, b) # Note it's equivalent to 'b in a'
+op.countOf(a, b) # a.count(b)
+op.delitem(a, b) # a.pop(b)
+op.delslice(a, b, c) # del a[b:c]
+op.getitem(a, b) # a[b]
+op.getslice(a, b, c) # a[b:c]
+op.indexOf(a, b) # a.find(b)
+op.repeat(a, b) # [1] * 8
+op.setitem(a, b, c) # a[b] = c
+op.setslice(a, b, c, v) # a[b:c] = v
+
+
+Note: Some operations have an 'in-place' version.
+z = op.iadd(x, y) # z = x, z += y
+a = op.iand(a, b) # a &= b
+a = op.iconcat(a, b) # a += b
+a = op.idiv(a, b) # a /= b
+
+Etc.
+
+# Section 6: Object type testing.
+Note: Some says it's not reliable
+
+# Section 7: Attribute access
+Example: Check this out:
+
+f = op.attrgetter('name')
+g = op.attrgetter('name', 'age')
+
+class Dog(object):
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+dudu = Dog('dudu', 3)
+didi = Dog('didi', 2)
+f(dudu) # dudu
+g(dudu) # dudu 3
+f(didi) # didi
+g(didi) # didi 2
+
+Seems pretty neat
+
+similarly:
+f = op.itemgetter(2)
+g = op.itemgetter(2, 5, 3)
+
+f(b) # b[2]
+g(b) # b[2] b[5], b[3]
+
+Also:
+f = op.methodcaller('name')
+g = op.methodcaller('name', 'age', bar=1)
+
+f(b) # b.name()
+g(b) # b.name('age', bar=1)
+
+
+Note: That's it greate hugh! Typing it all over, smart, hugh?
+
