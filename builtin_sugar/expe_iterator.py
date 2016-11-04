@@ -28,7 +28,7 @@ iterable object VS iterator:
 ===========================
 There is a builtin function 'iter' that takes an iterable object and give an iterator.
 This description makes me thinking, what is the difference of those two and what is
-the advantage of using it vs another. So I did following experiment:
+the advantage of using one vs another. So I did following experiment:
     >> a = [1, 2, 3,4]
     >> b = iter(a)
     >> type(a) # list
@@ -51,6 +51,15 @@ the advantage of using it vs another. So I did following experiment:
           iterable stuff.
 
     Advantage: I dont know for now.
+    1) Coming across an end, data once iterated, cannot be iterated again, this actually
+    says something about how the data is stored and consumed. It seems to be using one
+    memory space over and over again for each element that is consumed. The overall data
+    size is reduced everytime one object is consumed. However, I still don't think that
+    is such a big memory advantage, except that there is assurance, once you are done
+    with your algorithm, data is also being cleaned and space is freed up. I have done
+    experiment shows that iterator actually would need to store the whole dataset some
+    place. So even for big dataset, there has to be a big memory to start with to put
+    these data. But as algorithm goes on, memory needed is smaller and smaller.
 
 Summary:
 ========
@@ -64,6 +73,38 @@ Summary:
               in python 3.x, it's '__next__' method instead.
 
     3. and they both work on an iterable object, in the below example, it's 'numbers'.
+
+Below is a metaphore I had on stack overflow for it:
+
+I'm working at a kitchen, my boss give me a task of adding up the weight of 10
+(or 100 or a million) breads. I have a scale and a calculator( magic tricks of my algorithmn).
+Below are the iterable object, generator, iterator, approach difference:
+
+Iterable object: Each bread is stored in one box(memory), I weigh the first (or the 0th) bread,
+put down its weight, and put the bread back to the box, then go to the next one, weigh it and
+put it back, on and on, etc, etc. In the end, I got the overall weight, and the 10 (100 or
+million) breads are still there in their boxes.
+
+Generator: There are not enough boxes to store all these bread, So I asked for the help of a
+baker(the generator), he makes the first bread, give it to me, I weigh it, put the result
+down, throw that bread away and ask him for another one,on and on, etc, until I got the last
+bread (or maybe the baker runs out of flour). In the end, I have the result, none of the bread
+is there. But who cares, my boss only asks me to weigh these breads, he didn't say I cannot
+throw them away ( what a brilliant busboy).
+
+Iterator: I ask someone(iterator) to help me move first bread onto the scale, I weigh it,
+put the result down. This someone would go grab the next one for measuring, on and on, etc.
+I actually have no idea if someone (iterator) get the bread from a box or from a baker.
+Eventually, I got the overall weight, it doesn't matter to me.
+
+Anyway, to sum up:
+
+1. Iterable object need some memory to store data to start with.In the end, data is still there.
+2. Generator wouldn't need memory to store data to start with, it generates data on the go.
+3. Iterator is a channel between algorithm and its data. This data may already been there
+and stored in memory or may be generated on the go by a generator. In the first case, that
+memory would be freed bit by bit as iterator keeps iterating. So I agree a lot with above
+answer that iterator is good because of its abstraction that enables isolation of algorithm and data.
 """
 
 class myGene(object):
