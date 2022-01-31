@@ -70,7 +70,7 @@ class Dog(object):
 
 
 class BigDog(Dog):
-    weight=20
+    weight=22
 
 
 class SmallDog(Dog):
